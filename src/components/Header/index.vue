@@ -9,7 +9,6 @@
             <span>请</span>
             <router-link to="/login">登录</router-link>
             <router-link to="/register">注册</router-link>
-            
           </p>
         </div>
         <div class="typeList">
@@ -37,8 +36,13 @@
             type="text"
             id="autocomplete"
             class="input-error input-xxlarge"
+            v-model="keyword"
           />
-          <button class="sui-btn btn-xlarge btn-danger" type="button" @click="goSearch">
+          <button
+            class="sui-btn btn-xlarge btn-danger"
+            type="button"
+            @click="goSearch"
+          >
             搜索
           </button>
         </form>
@@ -49,109 +53,127 @@
 
 <script>
 export default {
-  name:"Header",
+  name: "Header",
+  data() {
+    return {
+      keyword: "",
+    };
+  },
   methods: {
-    goSearch(){
-      this.$router.push("/search")
-    }
+    goSearch() {
+      //路由传递参数
+      //一、字符串模式
+      // this.$router.push("/search/" + this.keyword);
+      // this.$router.push("/search/" +this.keyword+ "?k="+this.keyword.toLowerCase());
+      //二、模板字符串形式
+      // this.$router.push(`/search/${this.keyword}"?k="${this.keyword.toLowerCase()}`);
+      // 三、对象形式
+      this.$router.push({
+        name: "search",
+        params: {
+          keyword: this.keyword,
+        },
+        query: {
+          keyword: this.keyword,
+        },
+      });
+    },
   },
 };
 </script>
 
 <style lang="less" scoped>
-    .header {
-        &>.top {
-            background-color: #eaeaea;
-            height: 30px;
-            line-height: 30px;
+.header {
+  & > .top {
+    background-color: #eaeaea;
+    height: 30px;
+    line-height: 30px;
 
-            .container {
-                width: 1200px;
-                margin: 0 auto;
-                overflow: hidden;
+    .container {
+      width: 1200px;
+      margin: 0 auto;
+      overflow: hidden;
 
-                .loginList {
-                    float: left;
+      .loginList {
+        float: left;
 
-                    p {
-                        float: left;
-                        margin-right: 10px;
+        p {
+          float: left;
+          margin-right: 10px;
 
-                        .register {
-                            border-left: 1px solid #b3aeae;
-                            padding: 0 5px;
-                            margin-left: 5px;
-                        }
-                    }
-                }
-
-                .typeList {
-                    float: right;
-
-                    a {
-                        padding: 0 10px;
-
-                        &+a {
-                            border-left: 1px solid #b3aeae;
-                        }
-                    }
-
-                }
-
-            }
+          .register {
+            border-left: 1px solid #b3aeae;
+            padding: 0 5px;
+            margin-left: 5px;
+          }
         }
+      }
 
-        &>.bottom {
-            width: 1200px;
-            margin: 0 auto;
-            overflow: hidden;
+      .typeList {
+        float: right;
 
-            .logoArea {
-                float: left;
+        a {
+          padding: 0 10px;
 
-                .logo {
-                    img {
-                        width: 175px;
-                        margin: 25px 45px;
-                    }
-                }
-            }
-
-            .searchArea {
-                float: right;
-                margin-top: 35px;
-
-                .searchForm {
-                    overflow: hidden;
-
-                    input {
-                        box-sizing: border-box;
-                        width: 490px;
-                        height: 32px;
-                        padding: 0px 4px;
-                        border: 2px solid #ea4a36;
-                        float: left;
-
-                        &:focus {
-                            outline: none;
-                        }
-                    }
-
-                    button {
-                        height: 32px;
-                        width: 68px;
-                        background-color: #ea4a36;
-                        border: none;
-                        color: #fff;
-                        float: left;
-                        cursor: pointer;
-
-                        &:focus {
-                            outline: none;
-                        }
-                    }
-                }
-            }
+          & + a {
+            border-left: 1px solid #b3aeae;
+          }
         }
+      }
     }
+  }
+
+  & > .bottom {
+    width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+
+    .logoArea {
+      float: left;
+
+      .logo {
+        img {
+          width: 175px;
+          margin: 25px 45px;
+        }
+      }
+    }
+
+    .searchArea {
+      float: right;
+      margin-top: 35px;
+
+      .searchForm {
+        overflow: hidden;
+
+        input {
+          box-sizing: border-box;
+          width: 490px;
+          height: 32px;
+          padding: 0px 4px;
+          border: 2px solid #ea4a36;
+          float: left;
+
+          &:focus {
+            outline: none;
+          }
+        }
+
+        button {
+          height: 32px;
+          width: 68px;
+          background-color: #ea4a36;
+          border: none;
+          color: #fff;
+          float: left;
+          cursor: pointer;
+
+          &:focus {
+            outline: none;
+          }
+        }
+      }
+    }
+  }
+}
 </style>

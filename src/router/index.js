@@ -12,21 +12,32 @@ export default new VueRouter({
     routes: [
         {
             path: "/home",
-            component: Home
-        }, {
-            path: "/search",
-            component: Search
-        }, {
+            name: 'home',
+            component: Home,
+            meta: { show: true }
+        },
+        {
+            path: "/search/:keyword?",
+            name: "search",
+            component: Search,
+            meta: { show: true }
+        },
+        {
             path: "/register",
-            component: Register
-        }, {
+            name: "register",
+            component: Register,
+            meta: { show: false }
+        },
+        {
             path: "/login",
-            component: Login
+            name: "login",
+            component: Login,
+            meta: { show: false }
         },
         // 项目运行时候跳转首页
         {
-            path:"*",
-            redirect:"/home",
+            path: "*",
+            redirect: "/home"
         }
     ]
 })
