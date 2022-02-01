@@ -1,4 +1,4 @@
-# e-commerce
+# VUE2电商项目
 
 ## Project setup
 ```
