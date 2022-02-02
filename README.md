@@ -19,7 +19,6 @@ npm run build
 ```
 npm run lint
 ```
-
 # VUE电商实战笔记
 
 
@@ -261,4 +260,305 @@ npm run lint
   * <img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220201224916100.png" alt="image-20220201224916100" style="zoom:67%;" />
 
   
+
+-----
+
+## 7. 编程式路由传递报错处理
+
+在使用编程式路由跳转时，短时间多次触发跳转事件会出现报错：
+
+<img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220202133333863.png" alt="image-20220202133333863" style="zoom:80%;" />
+
+声明式路由在底层已经解决该问题，因此只需要关注编程式路由跳转问题。
+
+1. 为什么会有错误？
+
+   * `$router.push()`方法会返回一个Promise对象，需要处理成功或失败的回调。
+   * 可以再为push传递两个回调函数： `push(config,func,func)`，但是**治标不治本**，在别的组件中失效。
+
+2. 解决：
+
+   * push方法声明于VueRouter的原型对象中，函数上下文为VueRouter实例，因此选择在路由配置文件/router/index.js中重写push方法；
+
+   * ```javascript
+     //先把初始push存一份,repalce也同理
+     let originPush = VueRouter.prototype.push;
+     //重写方法
+     /**
+      * 
+      * @param {Object} location 路由配置
+      * @param {Function} resolve 
+      * @param {Function} reject 
+      */
+     VueRouter.prototype.push = function (location, resolve, reject) {
+         //使用.call()方法调用保存的push；当前this就指向VueRouter实例；
+         //call与apply：
+         //  相同：都可以调用函数，改变上下文
+         //  不同：call用逗号隔开参数，apply传递数组；
+         if (resolve && reject) {
+             originPush.call(this, location, reject);
+         } else {
+             // 没有传递则使用自定义
+             originPush.call(this, () => { }, () => { });
+         }
+     }
+     ```
+
+
+
+------
+
+## 8. 全局组件编写
+
+​	一些组件在各个地方都需要使用，可以注册为全局组件，在其他组件中无需引入注册便可直接使用。
+
+本次的三级联动在Home组件中的各个子组件都有用到，因此在入口文件中**声明全局组件**方便复用：
+
+```javascript
+//全局组件注册：
+import TypeNav from "@/pages/Home/TypeNav"
+//name、component
+Vue.component(TypeNav.name,TypeNav)	
+```
+
+<img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220202201119456.png" alt="image-20220202201119456" style="zoom:67%;" />
+
+
+
+----
+
+## 9. POSTMAN测试接口
+
+通过PSTMAN测试服务器接口是否有成功数据返回。
+
+<img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220202212511593.png" alt="image-20220202212511593" style="zoom:33%;" />
+
+<img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220202212537668.png" alt="image-20220202212537668" style="zoom: 33%;" />
+
+<img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220202212648476.png" alt="image-20220202212648476" style="zoom: 33%;" />
+
+
+
+----
+
+## 10. AXIOS二次封装
+
+为什么需要二次封装？
+
+ *  请求拦截器：再发送请求之前处理一些业务
+ *  响应拦截器：在数据返回后处理一些业务
+
+安装AXOIS：`npm install axios --save`
+
+> 项目中常在src下新建api文件夹，创建request.js，对axios二次封装。
+
+```javascript
+//二次封装AXIOS
+import axios from "axios";
+
+//利用axios的create方法创建实例
+const requests = axios.create({
+    baseURL: "/api",     //使得发送请求时在路径后自动加上/api再发送
+    timeout: 5000,
+})
+//请求拦截器：再请求发送之前活动
+request.interceptors.request.use(
+    (config) => { //config为配置对象，包含请求头headers
+        return config;
+    }
+)
+// 相应拦截
+request.interceptors.response.use(
+    (res) => { //成功回调
+        return res.data;
+    },
+    (err) => { //失败回调
+        return Promise.reject(new Error("faile"));
+    }
+)
+export default requests;
+```
+
+
+
+
+
+-----
+
+## 11. API接口统一管理
+
+* 当项目很小：可以直接再组件中发送请求
+* 当项目很大：再api文件夹下统一管理
+
+### 跨域问题
+
+协议、域名、端口有所不同都为跨域，通过JSONP、CORS、代理解决。
+
+可以通过webpack来帮助设置代理：
+
+再vue.config.js中：
+
+```javascript
+module.exports = {
+    //关闭eslint
+    lintOnSave: false,
+    devServer: {
+        proxy: {
+            '/api': {   //在请求路径中附带'api'时，代理服务器工作
+                target: 'http://39.98.123.211',   //目标服务器地址
+            }
+        }
+    }
+}
+```
+
+
+
+
+
+-----
+
+## 11. nprogress进度条设置
+
+nprogress是用于浏览器顶部的进度条展示，可以用于发送请求的进度
+
+安装`npm install nprogress --save`
+
+```javascript
+//引入进度条
+import nprogress from "nprogress";
+import "nprogress/nprogress.css"
+// start:开始  done:结束
+```
+
+```javascript
+//请求拦截器：再请求发送之前活动
+request.interceptors.request.use(
+    (config) => { //config为配置对象，包含请求头headers
+        //进度条
+        nprogress.start();
+        return config;
+    }
+)
+// 响应拦截
+request.interceptors.response.use(
+    (res) => { //成功回调
+        nprogress.done();
+        return res.data;
+    },
+    (err) => { //失败回调
+        return Promise.reject(new Error("faile"));
+    }
+)
+```
+
+
+
+-----
+
+## 12. VueX模块式开发
+
+集中式管理组件间共有数据。
+
+1. 基本使用
+
+   ```javascript
+   import Vue from "vue";
+   import Vuex from 'vuex'
+   Vue.use(Vuex);
+   
+   //state 存储数据
+   const state = {};
+   //mutations 修改state唯一手段
+   const Mutations = {}
+   //actions 处理action，响应dispatch，通过commit让mustation来修改state，可以书写自己业务逻辑
+   const actions = {};
+   //getters 类似计算属性，简化获取数据
+   const getters = {}
+   export default new Vuex.Store({
+       state, Mutations, actions, getters
+   
+   })
+   ```
+
+2. 模块式开发
+
+   让一个大量数据的仓库分为多个模块分别存储。
+
+   ```javascript
+   const state = {};
+   const Mutations = {}
+   const actions = {};
+   const getters = {}
+   export default {
+       state, Mutations, actions, getters
+   
+   }
+   
+   ····
+   //模块化引入
+   export default new Vuex.Store({
+       modules: { home, search }
+   
+   })
+   ```
+
+
+
+------
+
+## 13. 三级联动展示数据
+
+1. 获取服务器数据存于Vuex
+
+在三级联动组件在挂在的时候开始获取数据：
+
+```javascript
+  mounted() {
+    //挂载完毕获取数据存于仓库
+    this.$store.dispatch("categoryList");
+  },
+```
+
+```javascript
+const mutations = {
+    CATEGORYLIST(state, category) {
+        state.categoryList = category;
+    }
+}
+const actions = {
+    async categoryList({ commit }) {
+        //获取数据,使用包装好的请求拦截器
+        let res = await reqCategoryList();
+        if (res.code == 200) {
+            commit("CATEGORYLIST", res.data);
+        }
+
+    }
+};
+```
+
+2. 动态展示数据
+
+```html
+<div class="item" v-for="(k1,v1) in categoryList" :key="k1.categoryId">
+  <h3>
+    <a href="">{{k1.categoryName}}</a>
+  </h3>
+  <div class="item-list clearfix">
+    <div class="subitem" v-for="(k2,v2) in k1.categoryChild" :key="k2.categoryId">
+      <dl class="fore">
+        <dt>
+<a href="">{{k2.categoryName}}</a>
+        </dt>
+        <dd>
+<em v-for="(k3,v3) in k2.categoryChild" :key="k3.categoryId">
+  <a href="">{{k3.categoryName}}</a>
+</em>
+        </dd>
+      </dl>
+    </div>
+  </div>
+</div>
+```
 
