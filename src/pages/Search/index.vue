@@ -1,12 +1,14 @@
 <template>
   <div>
-    <h2>{{ $route.query.k }}</h2>
-    <h2>{{ $route.params.keyword }}</h2>
+
+<TypeNav :showSort="false"></TypeNav>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+    name: "search",
+};
 </script>
 
 <style lang="less" scoped>

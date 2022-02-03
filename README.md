@@ -18,7 +18,9 @@ npm run build
 ### Lints and fixes files
 ```
 npm run lint
-```
+
+
+
 # VUE电商实战笔记
 
 
@@ -257,7 +259,7 @@ npm run lint
 * 路由组件能不能传递props数据?
 
   * 可以，通过props方式将params数据传入路由组件，路由组件中需要在props中声明。比较少用。其中函数形式较为常用。
-  * <img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220201224916100.png" alt="image-20220201224916100" style="zoom:67%;" />
+  * <img src="https://cdn.jsdelivr.net/gh/x01914171/my-image@main/image-20220201224916100.png" alt="image-20220201224916100" style="zoom: 50%;" />
 
   
 
@@ -345,8 +347,8 @@ Vue.component(TypeNav.name,TypeNav)
 
 为什么需要二次封装？
 
- *  请求拦截器：再发送请求之前处理一些业务
- *  响应拦截器：在数据返回后处理一些业务
+	*  请求拦截器：再发送请求之前处理一些业务
+	*  响应拦截器：在数据返回后处理一些业务
 
 安装AXOIS：`npm install axios --save`
 
@@ -561,4 +563,174 @@ const actions = {
   </div>
 </div>
 ```
+
+3. 通过js方式实现动态改变CSS效果
+
+```javascript
+Vue鼠标事件
+@click="click"     ////单击
+@mousedown="down"       ////按下
+@mouseup="up"          ////抬起
+@dblclick="dblclick"      ////双击
+@mousemove="move"     ////移动
+@mouseleave="out"        ////离开
+@mouseout ="out"         ////移出
+@mouseenter="enter"     ////进入
+@mouseover="enter"        ////在
+```
+
+```javascript
+  data() {
+    return {
+      //三级联动用户当前鼠标对象下标
+      currentIndex: -1,
+    };
+  },
+  methods: {
+    //修改
+    changeIndex(index) {
+      index && (this.currentIndex = index);
+    },
+    leaveIndex() {
+      this.currentIndex = -1;
+    },
+  },
+```
+
+```html
+<div
+  class="item"
+  v-for="(k1, v1) in categoryList"
+  :key="k1.categoryId"
+  :class="{ cur: currentIndex - 1 == v1 }"	 //满足条件加上cur样式
+>
+  <h3
+    @mouseenter="changeIndex(k1.categoryId)"
+    @mouseleave="leaveIndex()"
+   >
+	<a href="">{{ k1.categoryName }}</a>
+  </h3>
+```
+
+```html
+  <div class="item-list clearfix" :style="{display:currentIndex==v1?'block':'none'}">
+      //动态加style样式
+```
+
+
+
+-----
+
+## 14. 防抖与节流
+
+卡顿现象：事件短时间内触发频繁，每次事件都要出发回调函数，计算造成卡顿。
+
+解决：**函数的防抖与节流**（lodash.js）
+
+ * 节流（throttle）：在规定时间内不重复触发回调，大于该时间才触发（少量触发）
+
+   * ```javascript
+     import _ from 'lodash';
+     //返回一个函数对象（相当于对执行函数进行包装）
+     // func:执行函数 | wait：延迟时间,在这时间之后才能触发下一次
+     _.throttle(func,wait,config)
+     ```
+
+ * 防抖（debounce）：连续快速触发只会执行最后一次。
+
+   * ```javascript
+     import _ from 'lodash';
+     //返回一个函数对象（相当于对执行函数进行包装）
+     // func:执行函数 | wait： 延迟时间
+     _.debounce(func,wait,config)
+     ```
+
+在三级联动中加入节流：
+
+* 按需引入节流：` import  throttle  from "lodash/throttle";`
+
+* ```javascript
+      changeIndex: throttle(function (index) {
+        index && (this.currentIndex = index);
+      },50),
+      leaveIndex() {
+        this.currentIndex = -1;
+      },
+  ```
+
+* ！！！**注意别用箭头函数**
+
+
+
+-------
+
+## 15. 三级联动路由跳转与参数传递（事件委派+编程式导航）
+
+再点击三级联动时候路由跳转，并传递商品信息参数。
+
+利用自定义属性来标识各个鼠标点击是否为`<a>`标签，并且判断层级。通过绑定`data-xxx`属性可以在结点的dataset属性中获取到xxx属性和属性值。
+
+```html
+<a
+  :data-categoryName="k2.categoryName"
+  :data-category2Id="k2.categoryId"
+  >{{ k2.categoryName }}</a>
+```
+
+```javascript
+    goSearch(event) {
+      let element = event.target; //获取触发事件结点
+      let { categoryname, category1id, category2id, category3id } =
+        element.dataset; //获取自定义属性
+
+      if (categoryname) {
+        let query = { categoryname };
+        if (category1id) query.category1Id = category1id;
+        else if (category2id) query.category2Id = category2id;
+        else if (category3id) query.category3Id = category3id;
+        this.$router.push({			//编程式路由跳转
+          name: "search",
+          query,
+        });
+      }
+    },
+```
+
+
+
+-----
+
+## 16. 过渡动画
+
+使用`<transition>`标签将需要动画的部分包括起来，在样式部分编写动画效果.
+
+在transition带有name属性后，需要在动画样式之前加上name-
+
+```html
+<transition name="sort">
+ <div class="sort" v-show="show"></div>
+</transition>
+```
+
+```less
+.sort{}
+.sort-enter {
+  // 动画进入
+  height: 0px;
+}
+.sort-end-to {
+  height: 461px;
+}
+.sort-enter-active {
+  transition: all 0.5s linear !important;
+}
+```
+
+
+
+------
+
+## 17. 合并参数
+
+
 

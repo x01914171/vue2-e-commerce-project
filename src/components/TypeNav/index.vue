@@ -2,55 +2,58 @@
   <!-- 商品分类导航 -->
   <div class="type-nav">
     <div class="container">
-      <div @mouseleave="leaveIndex()">
+      <div @mouseleave="leaveIndex()" @mouseenter="enterShow">
         <h2 class="all">全部商品分类</h2>
-        <div class="sort">
-          <div class="all-sort-list2" @click="goSearch">
-            <div
-              class="item"
-              v-for="(k1, v1) in categoryList"
-              :key="k1.categoryId"
-              :class="{ cur: currentIndex - 1 == v1 }"
-            >
-              <h3 @mouseenter="changeIndex(k1.categoryId)">
-                <a
-                  :data-categoryName="k1.categoryName"
-                  :data-category1Id="k1.categoryId"
-                  >{{ k1.categoryName }}</a
-                >
-              </h3>
+        <!-- 过渡动画 -->
+        <transition name="sort">
+          <div class="sort" v-show="show">
+            <div class="all-sort-list2" @click="goSearch">
               <div
-                class="item-list clearfix"
-                :style="{ display: currentIndex == v1 ? 'block' : 'none' }"
+                class="item"
+                v-for="(k1, v1) in categoryList"
+                :key="k1.categoryId"
+                :class="{ cur: currentIndex - 1 == v1 }"
               >
+                <h3 @mouseenter="changeIndex(k1.categoryId)">
+                  <a
+                    :data-categoryName="k1.categoryName"
+                    :data-category1Id="k1.categoryId"
+                    >{{ k1.categoryName }}</a
+                  >
+                </h3>
                 <div
-                  class="subitem"
-                  v-for="k2 in k1.categoryChild"
-                  :key="k2.categoryId"
+                  class="item-list clearfix"
+                  :style="{ display: currentIndex == v1 ? 'block' : 'none' }"
                 >
-                  <dl class="fore">
-                    <dt>
-                      <a
-                        :data-categoryName="k2.categoryName"
-                        :data-category2Id="k2.categoryId"
-                        >{{ k2.categoryName }}</a
-                      >
-                    </dt>
-                    <dd>
-                      <em v-for="k3 in k2.categoryChild" :key="k3.categoryId">
+                  <div
+                    class="subitem"
+                    v-for="k2 in k1.categoryChild"
+                    :key="k2.categoryId"
+                  >
+                    <dl class="fore">
+                      <dt>
                         <a
-                          :data-categoryName="k3.categoryName"
-                          :data-category3Id="k3.categoryId"
-                          >{{ k3.categoryName }}</a
+                          :data-categoryName="k2.categoryName"
+                          :data-category2Id="k2.categoryId"
+                          >{{ k2.categoryName }}</a
                         >
-                      </em>
-                    </dd>
-                  </dl>
+                      </dt>
+                      <dd>
+                        <em v-for="k3 in k2.categoryChild" :key="k3.categoryId">
+                          <a
+                            :data-categoryName="k3.categoryName"
+                            :data-category3Id="k3.categoryId"
+                            >{{ k3.categoryName }}</a
+                          >
+                        </em>
+                      </dd>
+                    </dl>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </transition>
       </div>
       <nav class="nav">
         <a href="###">服装城</a>
@@ -75,6 +78,7 @@ export default {
     return {
       //三级联动用户当前鼠标对象下标
       currentIndex: -1,
+      show: true,
     };
   },
   methods: {
@@ -83,9 +87,11 @@ export default {
     }, 50),
     leaveIndex() {
       this.currentIndex = -1;
+      if (this.$route.path != "/home") {
+        this.show = false;
+      }
     },
     goSearch(event) {
-      debugger
       let element = event.target; //获取触发事件结点
       let { categoryname, category1id, category2id, category3id } =
         element.dataset; //获取自定义属性
@@ -101,10 +107,14 @@ export default {
         });
       }
     },
+    enterShow() {
+      this.show = true;
+    },
   },
   mounted() {
-    //挂载完毕获取数据存于仓库
-    this.$store.dispatch("categoryList");
+    if (this.$route.path != "/home") {
+      this.show = false;
+    }
   },
   computed: {
     ...mapState({
@@ -235,6 +245,16 @@ export default {
           background-color: burlywood;
         }
       }
+    }
+    .sort-enter {
+      // 动画进入
+      height: 0px;
+    }
+    .sort-end-to {
+      height: 461px;
+    }
+    .sort-enter-active {
+      transition: all 0.5s linear !important;
     }
   }
 }

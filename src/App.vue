@@ -17,6 +17,11 @@ export default {
     Header,
     Footer,
   },
+  mounted() {
+    //只获取依次
+    //挂载完毕获取数据存于仓库
+    this.$store.dispatch("categoryList");
+  },
 };
 </script>
 
