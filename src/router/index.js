@@ -24,19 +24,19 @@ VueRouter.prototype.push = function (location, resolve, reject) {
     //  相同：都可以调用函数，改变上下文
     //  不同：call用逗号隔开参数，apply传递数组；
     if (resolve && reject) {
-        originPush.call(this, location, reject);
+        originPush.call(this, location, resolve,reject);
     } else {
         // 没有传递则使用自定义
-        originPush.call(this, () => { }, () => { });
+        originPush.call(this, location,() => { }, () => { });
     }
 }
 
 VueRouter.prototype.replace = function (location, resolve, reject) {
     if (resolve && reject) {
-        originReplace.call(this, location, reject);
+        originReplace.call(this, location, resolve,reject);
     } else {
         // 没有传递则使用自定义
-        originReplace.call(this, () => { }, () => { });
+        originReplace.call(this, location,() => { }, () => { });
     }
 }
 
