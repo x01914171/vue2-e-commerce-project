@@ -2,7 +2,44 @@
   <!-- 商品分类导航 -->
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <div @mouseleave="leaveIndex()">
+        <h2 class="all">全部商品分类</h2>
+        <div class="sort">
+          <div class="all-sort-list2">
+            <div
+              class="item"
+              v-for="(k1, v1) in categoryList"
+              :key="k1.categoryId"
+              :class="{ cur: currentIndex - 1 == v1 }"
+            >
+              <h3 @mouseenter="changeIndex(k1.categoryId)">
+                <a href="">{{ k1.categoryName }}</a>
+              </h3>
+              <div
+                class="item-list clearfix"
+                :style="{ display: currentIndex == v1 ? 'block' : 'none' }"
+              >
+                <div
+                  class="subitem"
+                  v-for="k2 in k1.categoryChild"
+                  :key="k2.categoryId"
+                >
+                  <dl class="fore">
+                    <dt>
+                      <a href="">{{ k2.categoryName }}</a>
+                    </dt>
+                    <dd>
+                      <em v-for="k3 in k2.categoryChild" :key="k3.categoryId">
+                        <a href="">{{ k3.categoryName }}</a>
+                      </em>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -13,37 +50,29 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
-        <div class="all-sort-list2">
-          <div class="item" v-for="(k1,v1) in categoryList" :key="k1.categoryId">
-            <h3>
-              <a href="">{{k1.categoryName}}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem" v-for="(k2,v2) in k1.categoryChild" :key="k2.categoryId">
-                <dl class="fore">
-                  <dt>
-                    <a href="">{{k2.categoryName}}</a>
-                  </dt>
-                  <dd>
-                    <em v-for="(k3,v3) in k2.categoryChild" :key="k3.categoryId">
-                      <a href="">{{k3.categoryName}}</a>
-                    </em>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import  throttle  from "lodash/throttle";
 export default {
   name: "TypeNav",
+  data() {
+    return {
+      //三级联动用户当前鼠标对象下标
+      currentIndex: -1,
+    };
+  },
+  methods: {
+    changeIndex: throttle(function (index) {
+      index && (this.currentIndex = index);
+    },50),
+    leaveIndex() {
+      this.currentIndex = -1;
+    },
+  },
   mounted() {
     //挂载完毕获取数据存于仓库
     this.$store.dispatch("categoryList");
@@ -169,9 +198,12 @@ export default {
 
           &:hover {
             .item-list {
-              display: block;
+              // display: block;
             }
           }
+        }
+        .cur {
+          background-color: burlywood;
         }
       }
     }
