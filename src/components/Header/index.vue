@@ -61,6 +61,7 @@ export default {
   },
   methods: {
     goSearch() {
+      console.log('来了')
       //路由传递参数
       //一、字符串模式
       // this.$router.push("/search/" + this.keyword);
