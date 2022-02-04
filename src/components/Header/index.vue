@@ -61,7 +61,6 @@ export default {
   },
   methods: {
     goSearch() {
-      console.log("来了");
       //路由传递参数
       //一、字符串模式
       // this.$router.push("/search/" + this.keyword);
@@ -69,14 +68,14 @@ export default {
       //二、模板字符串形式
       // this.$router.push(`/search/${this.keyword}"?k="${this.keyword.toLowerCase()}`);
       // 三、对象形式
+      let query = {};
+      this.$route.query && (query = this.$route.query);
       this.$router.push({
         name: "search",
         params: {
           keyword: this.keyword || undefined,
         },
-        query: {
-          keyword: this.keyword,
-        },
+        query,
       });
     },
   },

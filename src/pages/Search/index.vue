@@ -1,13 +1,13 @@
 <template>
   <div>
+    <TypeNav :showSort="false"></TypeNav>
 
-<TypeNav :showSort="false"></TypeNav>
   </div>
 </template>
 
 <script>
 export default {
-    name: "search",
+  name: "search",
 };
 </script>
 

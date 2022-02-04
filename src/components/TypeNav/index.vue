@@ -12,9 +12,11 @@
                 class="item"
                 v-for="(k1, v1) in categoryList"
                 :key="k1.categoryId"
-                :class="{ cur: currentIndex - 1 == v1 }"
               >
-                <h3 @mouseenter="changeIndex(k1.categoryId)">
+                <h3
+                  :class="{ cur: currentIndex-1 == v1 }"
+                  @mouseenter="changeIndex(k1.categoryId)"
+                >
                   <a
                     :data-categoryName="k1.categoryName"
                     :data-category1Id="k1.categoryId"
@@ -23,7 +25,7 @@
                 </h3>
                 <div
                   class="item-list clearfix"
-                  :style="{ display: currentIndex == v1 ? 'block' : 'none' }"
+                  :style="{ display: currentIndex-1 == v1 ? 'block' : 'none' }"
                 >
                   <div
                     class="subitem"
@@ -83,27 +85,34 @@ export default {
   },
   methods: {
     changeIndex: throttle(function (index) {
-      index && (this.currentIndex = index);
+      this.currentIndex = index;
     }, 50),
+
     leaveIndex() {
       this.currentIndex = -1;
       if (this.$route.path != "/home") {
         this.show = false;
       }
     },
+
     goSearch(event) {
       let element = event.target; //获取触发事件结点
       let { categoryname, category1id, category2id, category3id } =
         element.dataset; //获取自定义属性
 
       if (categoryname) {
+        let params = {};
         let query = { categoryname };
         if (category1id) query.category1Id = category1id;
         else if (category2id) query.category2Id = category2id;
         else if (category3id) query.category3Id = category3id;
+
+        this.$route.params && (params = this.$route.params);
+
         this.$router.push({
           name: "search",
           query,
+          params,
         });
       }
     },
@@ -121,7 +130,7 @@ export default {
       //对象写法右侧需要函数，在使用计算属性的时候执行，state为仓库中数据
       categoryList: (state) => state.home.categoryList,
     }),
-  },
+  }, 
 };
 </script>
 
