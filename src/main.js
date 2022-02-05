@@ -18,8 +18,15 @@ import router from '@/router'
 // 引入swiper
 import 'swiper/css/swiper.css'
 
+
+
+
 new Vue({
   render: h => h(App),
+  beforeCreate() {
+    // 全局事件配置
+    Vue.prototype.$bus = this;
+  },
   router,
   //注册仓库，组件会多一个$store属性
   store,

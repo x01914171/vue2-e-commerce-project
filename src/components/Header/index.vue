@@ -79,6 +79,11 @@ export default {
       });
     },
   },
+  mounted() {
+    this.$bus.$on("clearInput",()=>{
+      this.keyword=''
+    });
+  },
 };
 </script>
 

@@ -680,11 +680,11 @@ Vue鼠标事件
 ```javascript
     goSearch(event) {
       let element = event.target; //获取触发事件结点
-      let { categoryname, category1id, category2id, category3id } =
+      let { categoryName, category1id, category2id, category3id } =
         element.dataset; //获取自定义属性
 
-      if (categoryname) {
-        let query = { categoryname };
+      if (categoryName) {
+        let query = { categoryName };
         if (category1id) query.category1Id = category1id;
         else if (category2id) query.category2Id = category2id;
         else if (category3id) query.category3Id = category3id;
