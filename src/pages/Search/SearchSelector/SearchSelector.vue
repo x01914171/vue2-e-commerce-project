@@ -4,7 +4,11 @@
       <div class="fl key brand">品牌</div>
       <div class="value logos">
         <ul class="logo-list">
-          <li v-for="trade in trademarkList" :key="trade.tmId">
+          <li
+            v-for="trade in trademarkList"
+            :key="trade.tmId"
+            @click="tradeMarkHandler(trade)"
+          >
             {{ trade.tmName }}
           </li>
         </ul>
@@ -18,7 +22,11 @@
       <div class="fl key">{{ attr.attrName }}</div>
       <div class="fl value">
         <ul class="type-list">
-          <li v-for="(item, index) in attr.attrValueList" :key="index">
+          <li
+            v-for="(item, index) in attr.attrValueList"
+            :key="index"
+            @click="attrInfo(attr, item)"
+          >
             <a>{{ item }}</a>
           </li>
         </ul>
@@ -32,6 +40,14 @@
 import { mapGetters } from "vuex";
 export default {
   name: "SearchSelector",
+  methods: {
+    tradeMarkHandler(trade) {
+      this.$emit("tradeMarkInfo", trade);
+    },
+    attrInfo(attr, item) {
+      this.$emit("attrInfo", attr, item);
+    },
+  },
   computed: {
     ...mapGetters(["trademarkList", "attrsList"]),
   },

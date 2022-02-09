@@ -19,34 +19,59 @@
             <li class="with-x" v-if="searchInfo.keyword">
               {{ searchInfo.keyword }}<i @click="deleteKeyword">×</i>
             </li>
+            <!-- 品牌 -->
+            <li class="with-x" v-if="searchInfo.trademark">
+              {{ searchInfo.trademark.split(":")[1]
+              }}<i @click="deleteTrademark">×</i>
+            </li>
+            <!-- 售卖属性 -->
+            <li
+              class="with-x"
+              v-for="(item, index) in searchInfo.props"
+              :key="index"
+            >
+              {{ item.split(":")[1] }}<i @click="deleteAttr(index)">×</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @tradeMarkInfo="getTradeMark" @attrInfo="attrInfo" />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li
+                  :class="{ active: searchInfo.order.indexOf('1') != -1 }"
+                  @click="changeOrder(1)"
+                >
+                  <a href="#"
+                    >综合<i
+                      :class="
+                        searchInfo.order.indexOf('asc') != -1
+                          ? 'el-icon-arrow-up'
+                          : 'el-icon-arrow-down'
+                      "
+                      v-show="searchInfo.order.indexOf('1') != -1"
+                    ></i
+                  ></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
-                </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li
+                  :class="{ active: searchInfo.order.indexOf('2') != -1 }"
+                  @click="changeOrder(2)"
+                >
+                  <a href="#"
+                    >价格<i
+                      :class="
+                        searchInfo.order.indexOf('asc') != -1
+                          ? 'el-icon-arrow-up'
+                          : 'el-icon-arrow-down'
+                      "
+                      v-show="searchInfo.order.indexOf('2') != -1"
+                    ></i
+                  ></a>
                 </li>
               </ul>
             </div>
@@ -92,35 +117,13 @@
               </li>
             </ul>
           </div>
-          <div class="fr page">
-            <div class="sui-pagination clearfix">
-              <ul>
-                <li class="prev disabled">
-                  <a href="#">«上一页</a>
-                </li>
-                <li class="active">
-                  <a href="#">1</a>
-                </li>
-                <li>
-                  <a href="#">2</a>
-                </li>
-                <li>
-                  <a href="#">3</a>
-                </li>
-                <li>
-                  <a href="#">4</a>
-                </li>
-                <li>
-                  <a href="#">5</a>
-                </li>
-                <li class="dotted"><span>...</span></li>
-                <li class="next">
-                  <a href="#">下一页»</a>
-                </li>
-              </ul>
-              <div><span>共10页&nbsp;</span></div>
-            </div>
-          </div>
+          <Pagination
+            :pageNo="searchInfo.pageNo"
+            :pageSize="searchInfo.pageSize"
+            :total="total"
+            :continues="5"
+            @changePage="changePage"
+          ></Pagination>
         </div>
       </div>
     </div>
@@ -128,7 +131,7 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import SearchSelector from "./SearchSelector/SearchSelector";
 export default {
   name: "Search",
@@ -143,7 +146,7 @@ export default {
         category3Id: "",
         categoryname: "",
         keyword: "",
-        order: "",
+        order: "1:desc",
         pageNo: 1,
         pageSize: 10,
         props: [],
@@ -185,9 +188,51 @@ export default {
       //清空headers输入框
       this.$bus.$emit("clearInput");
     },
+    deleteTrademark() {
+      this.searchInfo.trademark = undefined;
+      this.getSearchData(this.searchInfo);
+    },
+    deleteAttr(index) {
+      this.searchInfo.props.splice(index, 1);
+      this.getSearchData(this.searchInfo);
+    },
+    getTradeMark(trade) {
+      this.searchInfo.trademark = `${trade.tmId}:${trade.tmName}`;
+      //再次发送请求
+      this.getSearchData(this.searchInfo);
+    },
+    attrInfo(attr, item) {
+      let prop = `${attr.attrId}:${item}:${attr.attrName}`;
+      if (this.searchInfo.props.indexOf(prop) == -1) {
+        this.searchInfo.props.push(prop);
+      }
+      //再次发送请求
+      this.getSearchData(this.searchInfo);
+    },
+    changeOrder(type) {
+      let order = this.searchInfo.order;
+      let orderType = order.split(":")[0];
+      let orderDirection = order.split(":")[1];
+      if (orderType == type) {
+        orderDirection == "desc"
+          ? (orderDirection = "asc")
+          : (orderDirection = "desc");
+      } else {
+        orderType = type;
+      }
+      this.searchInfo.order = `${orderType}:${orderDirection}`;
+      this.getSearchData(this.searchInfo);
+    },
+    changePage(pageNo) {
+      this.searchInfo.pageNo = pageNo;
+      this.getSearchData(this.searchInfo);
+    },
   },
   computed: {
     ...mapGetters(["goodsList", "trademarkList", "attrsList"]),
+    ...mapState({
+      total: (state) => state.search.seachList.total,
+    }),
   },
   watch: {
     //监听路由变化
