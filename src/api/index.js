@@ -17,7 +17,13 @@ export const reqSearchInfo = (params) => {
         data: params
     })
 }
-
+export const reqDetail = (id) => {
+    //至少设置一个空对象
+    return requests({
+        url: `/item/${id}`,
+        method: 'GET',
+    })
+}
 //mock模拟数据
 export const reqBanner = () => {
     //在封装时候已经设置好baseurl=‘/mock’
