@@ -6,25 +6,31 @@
     <!-- 主要内容区域 -->
     <section class="con">
       <!-- 导航路径区域 -->
-      <div class="conPoin" >
-        <span v-show="categoryView.category1Name">{{categoryView.category1Name}}</span>
-        <span v-show="categoryView.category2Name">{{categoryView.category2Name}}</span>
-        <span v-show="categoryView.category3Name">{{categoryView.category3Name}}</span>
+      <div class="conPoin">
+        <span v-show="categoryView.category1Name">{{
+          categoryView.category1Name
+        }}</span>
+        <span v-show="categoryView.category2Name">{{
+          categoryView.category2Name
+        }}</span>
+        <span v-show="categoryView.category3Name">{{
+          categoryView.category3Name
+        }}</span>
       </div>
       <!-- 主要内容区域 -->
       <div class="mainCon">
         <!-- 左侧放大镜区域 -->
         <div class="previewWrap">
           <!--放大镜效果-->
-          <Zoom :skuImageList="imageList"/>
+          <Zoom :skuImageList="imageList" />
           <!-- 小图列表 -->
-          <ImageList />
+          <ImageList :skuImageList="imageList" />
         </div>
         <!-- 右侧选择区域布局 -->
         <div class="InfoWrap">
           <div class="goodsDetail">
             <h3 class="InfoName">
-              {{skuInfo.skuName}}
+              {{ skuInfo.skuName }}
             </h3>
             <p class="news">
               推荐选择下方[移动优惠购],手机套餐齐搞定,不用换号,每月还有花费返
@@ -36,7 +42,7 @@
                 </div>
                 <div class="price">
                   <i>¥</i>
-                  <em>{{skuInfo.price}}</em>
+                  <em>{{ skuInfo.price }}</em>
                   <span>降价通知</span>
                 </div>
                 <div class="remark">
@@ -75,11 +81,17 @@
           <div class="choose">
             <div class="chooseArea">
               <div class="choosed"></div>
-              <dl v-for="(item) in skuInfo.skuAttrValueList" :key="item.id">
-                <dt class="title">选择{{item.saleAttrName}}</dt>
-                <dd changepirce="0" class="active">金色</dd>
-                <dd changepirce="40">银色</dd>
-                <dd changepirce="90">黑色</dd>
+              <dl v-for="item in spuSaleAttrList" :key="item.id">
+                <dt class="title">{{ item.saleAttrName }}</dt>
+                <dd
+                  changepirce="0"
+                  :class="{ active: attr.isChecked === '1' }"
+                  v-for="attr in item.spuSaleAttrValueList"
+                  :key="attr.id"
+                  @click="changeActive(item.spuSaleAttrValueList, attr)"
+                >
+                  {{ attr.saleAttrValueName }}
+                </dd>
               </dl>
             </div>
             <div class="cartWrap">
@@ -338,15 +350,23 @@ export default {
     ImageList,
     Zoom,
   },
+  methods: {
+    changeActive(attrList, attr) {
+      attrList.forEach((ele) => {
+        ele.isChecked = "0";
+      });
+      attr.isChecked = "1";
+    },
+  },
   mounted() {
     // 获取商品信息
     this.$store.dispatch("detailList", this.$route.params.skuId);
   },
   computed: {
-    ...mapGetters(['categoryView','skuInfo','spuSaleAttrList']),
-    imageList(){
+    ...mapGetters(["categoryView", "skuInfo", "spuSaleAttrList"]),
+    imageList() {
       return this.skuInfo.skuImageList || [];
-    }
+    },
   },
 };
 </script>
