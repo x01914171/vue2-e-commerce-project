@@ -5,6 +5,7 @@ Vue.use(Vuex);
 import home from './home';
 import search from './search';
 import detail from './detail';
+import shopcart from './shopcart';
 
 //state 存储数据
 const state = {};
@@ -15,6 +16,6 @@ const actions = {};
 //getters 类似计算属性，简化获取数据
 const getters = {}
 export default new Vuex.Store({
-    modules: { home, search,detail }
+    modules: { home, search,detail,shopcart }
 
 })

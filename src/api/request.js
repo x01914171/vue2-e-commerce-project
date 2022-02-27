@@ -5,6 +5,8 @@ import nprogress from "nprogress";
 import "nprogress/nprogress.css"
 // start:开始  done:结束
 
+//引入store
+import store from '@/store'
 
 //利用axios的create方法创建实例
 const requests = axios.create({
@@ -16,6 +18,10 @@ requests.interceptors.request.use(
     (config) => { //config为配置对象，包含请求头headers
         //进度条
         nprogress.start();
+
+        if(store.state.detail.uuid_token){
+            config.headers.userTempId = store.state.detail.uuid_token;
+        }
         return config;
     }
 )

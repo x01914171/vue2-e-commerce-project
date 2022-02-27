@@ -1,8 +1,10 @@
-import { reqDetail, reqAddOrUpdateShopCart } from "../../api";
-
+import { reqDetail, reqAddOrUpdateShopCart } from "@/api";
+import { getUUID } from '@/utils/uuid_token';
 
 const state = {
     detailList: {},
+    //游客临时身份
+    uuid_token: getUUID(),
 };
 const mutations = {
     DETAILLIST(state, detailList) {
@@ -17,11 +19,11 @@ const actions = {
             commit("DETAILLIST", res.data);
         }
     },
-    async addDataOnShopCat({ commit }, {skuId, skuNum}) {
+    async addDataOnShopCat({ commit }, { skuId, skuNum }) {
         let res = await reqAddOrUpdateShopCart(skuId, skuNum);
         if (res.code == 200) {
             return 'ok'
-        }else{
+        } else {
             return Promise.reject(new Error('faile'))
         }
     }
