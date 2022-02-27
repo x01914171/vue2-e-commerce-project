@@ -1,4 +1,4 @@
-import { reqDetail } from "../../api";
+import { reqDetail, reqAddOrUpdateShopCart } from "../../api";
 
 
 const state = {
@@ -10,23 +10,30 @@ const mutations = {
     },
 }
 const actions = {
-    async detailList({ commit },skuid) {
+    async detailList({ commit }, skuid) {
         //获取数据
         let res = await reqDetail(skuid);
         if (res.code == 200) {
             commit("DETAILLIST", res.data);
         }
-
     },
+    async addDataOnShopCat({ commit }, {skuId, skuNum}) {
+        let res = await reqAddOrUpdateShopCart(skuId, skuNum);
+        if (res.code == 200) {
+            return 'ok'
+        }else{
+            return Promise.reject(new Error('faile'))
+        }
+    }
 };
 const getters = {
-    categoryView(state){
+    categoryView(state) {
         return state.detailList.categoryView || {};
     },
-    skuInfo(state){
+    skuInfo(state) {
         return state.detailList.skuInfo || {};
     },
-    spuSaleAttrList(){
+    spuSaleAttrList() {
         return state.detailList.spuSaleAttrList || [];
     }
 }

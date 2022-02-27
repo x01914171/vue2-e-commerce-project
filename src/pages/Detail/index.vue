@@ -33,7 +33,7 @@
               {{ skuInfo.skuName }}
             </h3>
             <p class="news">
-              推荐选择下方[移动优惠购],手机套餐齐搞定,不用换号,每月还有花费返
+              {{ skuInfo.skuDesc }}
             </p>
             <div class="priceArea">
               <div class="priceArea1">
@@ -96,12 +96,22 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt" />
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input
+                  autocomplete="off"
+                  class="itxt"
+                  v-model="skuNum"
+                  @change="changeSkuNum"
+                />
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a
+                  href="javascript:"
+                  class="mins"
+                  @click="skuNum > 1 ? skuNum-- : (skunum = 1)"
+                  >-</a
+                >
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a @click="AddShopCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -350,12 +360,46 @@ export default {
     ImageList,
     Zoom,
   },
+  data() {
+    return {
+      skuNum: 1, //产品个数
+    };
+  },
   methods: {
+    // 修改商品属性
     changeActive(attrList, attr) {
       attrList.forEach((ele) => {
         ele.isChecked = "0";
       });
       attr.isChecked = "1";
+    },
+    // 修改产品个数
+    changeSkuNum(event) {
+      // 非法
+      if (isNaN(event.target.value * 1) || event.target.value < 1) {
+        this.skuNum = 1;
+      } else {
+        this.skuNum = parseInt(event.target.value);
+      }
+    },
+    // 购物车
+    AddShopCart() {
+      let res = this.$store.dispatch("addDataOnShopCat", {
+        skuId: this.$route.params.skuId,
+        skuNum: this.skuNum,
+      });
+      res.then(
+        (value) => {
+          //成功后跳转,携带产品信息
+          // this.$router.push({name:'AddCartSuccess',query:{skuNum:this.skuNum,skuInfo:this.skuInfo}});
+          sessionStorage.setItem("skuInfo", JSON.stringify(this.skuInfo));
+          this.$router.push({name:'AddCartSuccess',query:{skuInfo:this.skuInfo}});
+        },
+        //失败后提示
+        (reason) => {
+          console.log("失败");
+        }
+      );
     },
   },
   mounted() {
