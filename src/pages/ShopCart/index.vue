@@ -28,7 +28,7 @@
             <a
               href="javascript:void(0)"
               class="mins"
-              @click="changeNum('min', -1)"
+              @click="changeNum('mins', -1, item)"
               >-</a
             >
             <input
@@ -37,12 +37,12 @@
               minnum="1"
               class="itxt"
               :value="item.skuNum"
-              @change="changeNum('change', $event.target.value * 1)"
+              @change="changeNum('change', $event.target.value * 1, item)"
             />
             <a
               href="javascript:void(0)"
               class="plus"
-              @click="changeNum('plus', 1)"
+              @click="changeNum('plus', 1, item)"
               >+</a
             >
           </li>
@@ -50,7 +50,9 @@
             <span class="sum">{{ item.skuPrice * item.skuNum }}</span>
           </li>
           <li class="cart-list-con7">
-            <a href="#none" class="sindelet">删除</a>
+            <a href="#none" class="sindelet" @click="deletesku(item.skuId)"
+              >删除</a
+            >
             <br />
             <a href="#none">移到收藏</a>
           </li>
@@ -88,6 +90,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import throttle from "lodash/throttle";
 export default {
   name: "ShopCart",
   methods: {
@@ -100,18 +103,38 @@ export default {
         element.isChecked = event.target.checked;
       });
     },
+    async deletesku(id) {
+      let res = await this.$store.dispatch("reqDeleteShopCart", id);
+      res
+        .then((result) => {
+          this.getData();
+        })
+        .catch((err) => {});
+    },
     // 修改个数
-    changeNum(type,num,id) {
+    changeNum:throttle(async function(type, num, cart) {
+      debugger;
       switch (type) {
         case "mins":
-          this.$store.dispatch()
+          cart.skuNum > 1 ? (num = -1) : (num = 0);
+          console.log("object :>> ", cart.skuNum);
           break;
         case "plus":
           break;
         case "change":
+          isNaN(num) || num < 1
+            ? (num = 0)
+            : (num = parseInt(num) - cart.skuNum);
           break;
       }
-    },
+      try {
+        await this.$store.dispatch("addDataOnShopCat", {
+          skuId: cart.skuId,
+          skuNum: num,
+        });
+        this.getData();
+      } catch (error) {}
+    })
   },
   mounted() {
     this.getData();

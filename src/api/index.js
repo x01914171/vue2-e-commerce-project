@@ -38,16 +38,22 @@ export const reqFloor = () => {
 
 // 购物车
 // /api/cart/addToCart/{ skuId }/{ skuNum }
-export const reqAddOrUpdateShopCart = (skuId,skuNum)=>{
+export const reqAddOrUpdateShopCart = (skuId, skuNum) => {
     return requests({
-        url:`/cart/addToCart/${ skuId }/${ skuNum }`,
-        method:'POST',
+        url: `/cart/addToCart/${skuId}/${skuNum}`,
+        method: 'POST',
     })
 }
-
-export const reqShopCartList = ()=>{
+// 删除购物车 
+export const reqDeleteShopCart = (skuId) => {
     return requests({
-        url:`/cart/cartList`,
-        method:'GET',
+        url: `/cart/deleteCart/${skuId}`,
+        method: 'DELETE',
+    })
+}
+export const reqShopCartList = () => {
+    return requests({
+        url: `/cart/cartList`,
+        method: 'GET',
     })
 }
