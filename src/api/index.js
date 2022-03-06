@@ -64,3 +64,21 @@ export const reqUpdataSelected = (skuID,isChecked)=>{
         method: 'GET',
     })
 }
+
+
+// 注册验证码
+export const reqCode = (phone)=>{
+    return requests({
+        url: `/user/passport/sendCode/${phone}`,
+        method: 'GET',
+    })
+    
+}
+export const reqUserRegister = (data)=>{
+    return requests({
+        url: `/user/passport/register`,
+        data,
+        method: 'POST',
+    })
+    
+}
