@@ -70,7 +70,7 @@
         <span>全选</span>
       </div>
       <div class="option">
-        <a href="#none">删除选中的商品</a>
+        <a href="#none" @click="deleteSelected">删除选中的商品</a>
         <a href="#none">移到我的关注</a>
         <a href="#none">清除下柜商品</a>
       </div>
@@ -103,16 +103,26 @@ export default {
         element.isChecked = event.target.checked;
       });
     },
+    // 删除选中
+    async deleteSelected() {
+      try {
+        await this.$store.dispatch("deleteSelected");
+        this.getData();
+      } catch (error) {
+        console.log('失败')
+      }
+    },
+    // 删除一个
     async deletesku(id) {
-      let res = await this.$store.dispatch("reqDeleteShopCart", id);
-      res
-        .then((result) => {
-          this.getData();
-        })
-        .catch((err) => {});
+      try {
+        await this.$store.dispatch("getDeleteShopCart", id);
+        this.getData();
+      } catch (error) {
+        console.log("fail");
+      }
     },
     // 修改个数
-    changeNum:throttle(async function(type, num, cart) {
+    changeNum: throttle(async function (type, num, cart) {
       debugger;
       switch (type) {
         case "mins":
@@ -134,7 +144,7 @@ export default {
         });
         this.getData();
       } catch (error) {}
-    })
+    }),
   },
   mounted() {
     this.getData();

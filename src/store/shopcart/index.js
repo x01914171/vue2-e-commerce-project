@@ -1,4 +1,4 @@
-import { reqShopCartList } from "@/api";
+import { reqShopCartList, reqDeleteShopCart } from "@/api";
 
 const state = {
     shopCartList: []
@@ -15,20 +15,29 @@ const actions = {
             commit('GETSHOPCARTLIST', res.data)
         }
     },
-    async reqDeleteShopCart({ commit },skuId) {
-        let res = await reqShopCartList();
+    async getDeleteShopCart({ commit }, skuId) {
+        let res = await reqDeleteShopCart(skuId);
         if (res.code === 200) {
             // 返回Promise
             return 'OK'
-        }else{
+        } else {
             return new Promise.reject(new Error("faile"))
         }
     },
-    
+    deleteSelected({ getters, dispatch }) {
+        debugger
+        let promises = [];
+        getters.shopCartList.cartInfoList.forEach(element => {
+            let promise = element.isChecked == 1 ? dispatch('getDeleteShopCart', element.skuId) : '';
+            promises.push(promise);
+        });
+        return Promise.all(promises);
+    }
+
 };
 const getters = {
-    shopCartList(state){
-        return state.shopCartList[0]|| {};
+    shopCartList(state) {
+        return state.shopCartList[0] || {};
     }
 }
 export default {
