@@ -13,7 +13,12 @@
       <div class="cart-body">
         <ul class="cart-list" v-for="item in cartInfoList" :key="item.id">
           <li class="cart-list-con1">
-            <input type="checkbox" name="chk_list" :checked="item.isChecked" />
+            <input
+              type="checkbox"
+              name="chk_list"
+              :checked="item.isChecked"
+              @change="check($event, item.skuId)"
+            />
           </li>
           <li class="cart-list-con2">
             <img :src="item.imgUrl" />
@@ -98,10 +103,27 @@ export default {
     getData() {
       this.$store.dispatch("getShopCartList");
     },
-    selectAll(event) {
-      this.cartInfoList.forEach((element) => {
-        element.isChecked = event.target.checked;
-      });
+    async check(event, id) {
+      let checked = event.target.checked ? "1" : "0";
+      try {
+        await this.$store.dispatch("updataCheckedById", {
+          skuId: id,
+          checked: checked,
+        });
+        this.getData();
+      } catch (error) {
+        console.log("失败");
+      }
+    },
+    // 全选
+    async selectAll(event) {
+      let checked = event.target.checked ? "1" : "0";
+      try {
+        await this.$store.dispatch("selectAll", checked);
+        this.getData();
+      } catch (error) {
+        console.log("失败");
+      }
     },
     // 删除选中
     async deleteSelected() {
@@ -109,7 +131,7 @@ export default {
         await this.$store.dispatch("deleteSelected");
         this.getData();
       } catch (error) {
-        console.log('失败')
+        console.log("失败");
       }
     },
     // 删除一个

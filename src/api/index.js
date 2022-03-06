@@ -57,3 +57,10 @@ export const reqShopCartList = () => {
         method: 'GET',
     })
 }
+// 切换商品选中
+export const reqUpdataSelected = (skuID,isChecked)=>{
+    return requests({
+        url: `/cart/checkCart/${skuID}/${isChecked}`,
+        method: 'GET',
+    })
+}

@@ -1,4 +1,4 @@
-import { reqShopCartList, reqDeleteShopCart } from "@/api";
+import { reqShopCartList, reqDeleteShopCart, reqUpdataSelected } from "@/api";
 
 const state = {
     shopCartList: []
@@ -24,15 +24,32 @@ const actions = {
             return new Promise.reject(new Error("faile"))
         }
     },
+    async updataCheckedById({ commit }, sku) {
+        let res = await reqUpdataSelected(sku.skuId, sku.checked);
+        if (res.code === 200) {
+            // 返回Promise
+            return 'OK'
+        } else {
+            return new Promise.reject(new Error("faile"))
+        }
+    },
     deleteSelected({ getters, dispatch }) {
-        debugger
         let promises = [];
         getters.shopCartList.cartInfoList.forEach(element => {
             let promise = element.isChecked == 1 ? dispatch('getDeleteShopCart', element.skuId) : '';
             promises.push(promise);
         });
         return Promise.all(promises);
-    }
+    },
+    // 全选
+    selectAll({ getters, dispatch }, checked) {
+        let promises = [];
+        getters.shopCartList.cartInfoList.forEach(element => {
+            let promise = dispatch('updataCheckedById', { skuId: element.skuId, checked: checked });
+            promises.push(promise);
+        });
+        return Promise.all(promises);
+    },
 
 };
 const getters = {
